@@ -1,0 +1,231 @@
+think in java 网上月度材料: http://www.yq1012.com/ThinkingInJava/
+1. 早期的CGI
+
+2. 对象其实保存的是一个句柄 (handle)  对象的传递也是一个句柄的信息。 所以在比较时 和 改变时 需要注意
+
+equals() 默认是比较句柄信息。
+
+3. 向上造型(编译器是允许的) 和 向下造型 --- 更窄    从顶Object 向下造型 
+
+4. finalize 垃圾收集器只知道自动收集new 对象的堆信息，不知道其他特殊化的东西，那么可实现此方法
+
+5. 编译器 和 运行期
+
+页签 - 第五章： 隐藏实施过程  ----- 页码 124 页
+
+6. 第六章 类再生 页码140页
+
+1. JVM执行引擎之方法调用
+
+class存放在堆里，编译后的class文件不包括传统编译器的连接步骤，一切方法调用在class文件里面存储的是符号引用
+
+而不是方法在实际运行时内存布局中的入口地址（直接引用）。也就是需要在类加载阶段，甚至到运行期才能确定目标方法的直接引用。
+
+2. 解析：
+
+如前所述，所有的方法调用中的目标方法在Class文件里面都是一个常量池中的符号引用，在类加载阶段，会将其中的一部分符号引用转化为直接引用，
+
+这种解析能成立的前提是：方法在程序真正运行之前就有一个可确定的调用版本，并且这个方法的调用版本在运行期间是不可变的。
+
+也就是说，调用目标在程序代码写好、编译器进行编译时就必须确定下来，这类方法的调用成为解析。
+
+JAVA中符号“编译器可知、运行期不可变”的方法包括：静态方法、私有方法两大类。
+
+前者与类型直接关联，后者在外部不可被访问，这就决定了他们都不可能通过继承或别的方式重写其版本。
+
+因此都适合在类的加载阶段进行解析。
+
+JAVA虚拟机里面提供了5条方法调用字节码指令。分别如下：
+
+      a、invokestatic:调用静态方法
+
+      b、invokespecial:调用实例构造器<init>方法、私有方法和父类方法（super(),super.method()）。
+
+      c、invokevirtual:调用所有的虚方法(静态方法、私有方法、实例构造器、父类方法、final方法都是非虚方法)。
+
+      d、invokeinterface:调用接口方法，会在运行时期再确定一个实现此接口的对象。
+
+			e、invokedynamic:现在运行时期动态解析出调用点限定符所引用的方法，然后再执行该方法，
+				 
+				 在此之前的4条指令，分派逻辑都是固化在虚拟机里面的，而invokedynamic指令的分派逻辑是由用户所设定的引导方法决定的。
+
+只要能被invokestatic和invokespecial指令调用的方法都可以在解析阶段中确定唯一的调用版本，符合这个条件的有静态方法、私有方法、实例构造器、父类方法4类，
+
+它们在类加载阶段就会把符号引用解析为该方法的直接引用。
+
+这些方法称为非虚方法（还包括使用final修饰的方法，虽然final方法使用invokevirtual指令调用，
+
+因为final方法注定不会被重写，也就是无法被覆盖，也就无需对其进行多态选择）
+
+解析调用一定是一个静态的过程，在编译期间就可以完全确定，
+
+在类装载的解析阶段就会把涉及的符号引用全部转化为可确定的直接引用，
+
+不会延迟到运行期去完成。而分派调用可能是静态的也可能是动态的，
+
+根据分派一句的宗量数可分为单分派和多分派。
+
+因此分派可分为：静态单分派、静态多分派、动态单分派、动态多分派。
+
+
+a. 方法重载 (静态分派)：
+
+	多态导致对象有静态类型 和 实际类型的区别 ，实际类型变化的结果在运行期才可以确定，编译器在编译程序的时候并不知道一个对象的实际类型是什么。
+	
+	虚拟机（编译器）在确定重载函数版本时是通过参数的静态类型而不是实际类型作为判定依据。
+	
+	因此，在编译阶段，编译器就可以根据静态类型确定使用哪个重载的版本。
+	
+b. 方法重写Override(动态分派)
+
+	如上所示，方法的调用指令都使用了invokevirtual指令，invokevirtual指令的运行时解析过程大致分为以下几个步骤。
+
+       1）找到操作数栈顶的第一个元素(对象引用)所指向的对象的实际类型，记作C；
+
+       2）如果在类型C中找到与常量中的描述符和简单名称都相符的方法，则进行访问权限校验，如果通过则返回这个方法的直接引用，查找过程结束；如果不通过，则返回java.lang.IllegalAccessError。
+
+      3）否则，按照继承关系从下往上依次对C的各个父类进行第2步的搜索和验证。
+
+      4）如果始终没有找到合适的方法，则抛出java.lang.AbstractMethodError异常。
+      
+由于invokevirtual指令执行的第一步就是在运行期确定接收者的实际类型，这又是java语言中方法重写产生多态的本质
+
+首先看看编译阶段编译器的选择，也就是静态分派的过程(关于重载)。
+
+此时选择目标方法的依据有两点：一是静态类型是Father还是Son，而是方法参数是QQ还是_360。
+
+此处选择结果最终的产物是产生了两条invokevirtual指令，
+
+两条指令的参数分别是指向Father.hardChoice(_360)和Father.hardChoice(QQ)方法的符号引用。
+
+因为是根据两个宗量进行分派，所以java语言的静态分派属于多分派类型。 
+
+再看看运行阶段虚拟机的选择，也就是动态分派的过程（关于重写），
+
+在执行“son.hardChoice(new QQ());”这句代码时，更准确的说，是在执行invokevirtual指令时，
+
+由于编译器已经确定了目标方法的签名必须是hardChoice(QQ)，虚拟机此时不会关心传过来的参数类型，
+
+也就是此时传过来的实际类型、静态类型都不会对产生任何影响。
+
+唯一可以对虚拟机的选择产生影响的就是此方法的接收者的实际类型是Father还是Son。
+
+因为只有一个宗量作为依据，所以java语言的动态分派属于单分派。   
+
+
+JAVA IO  1.0
+
+InputStream / OutputStream 
+
+FileInputStream / FileOutputStream
+
+PipedInputStream / PipedOutputStream
+
+FilterOutputStream / FilterInputStream
+
+BufferedOutputStream / BufferedInputStream
+
+DataInputStream  -》 BufferedInputStream - 》 FileInputStream
+
+readLine
+
+StringBufferInputStream(String)
+
+read != -1
+
+DataInputStream  - > StringBufferInputStream
+
+PrintStream
+
+
+JAVA IO 1.1
+
+Reader / Writer
+
+InputStreamReader(InputStream in , charset) / OutputStreamWriter(OutputStream out , charset)
+
+FileReader / FileWriter 
+
+FilterReader / FilterWriter
+
+BufferedReader / BufferedWriter
+
+PrintWriter
+
+压缩：
+
+GZIPInputStream(InputStream in  int size) /  ZIPInputStream(InputStream in)
+
+CheckedInputStream(InputStream, new Adler32() ? new CRC32() ) / CheckedOutputStream
+
+
+CheckedOutputStream
+
+GZIPOutputStream / ZIPOutputStream
+
+加入zip文件 ： out.putNextEntry(new ZipEntry(String FileName))
+
+对象序列化：
+
+ObjectOutputStream(OutputStream out)
+
+ObjectOutputStream(FileOutputStream )
+
+ObjectInputStream(FileInputStream)
+
+ByteArrayOutputStream / ByteArrayInputStream(ByteArrayOutputStream .toByteArray() )           ----------------- inputstream
+
+
+多线程 中的 - daemon 线程
+
+线程分 用户线程 和 Daemon线程(依赖于用户线程)
+
+网络编程 四要素
+
+clientHost（客户机主机）
+
+clientPortNumber（客户机端口）
+
+serverHost(服务主机)
+
+serverPortNumber(服务端口号)
+
+UDP 不可靠通讯协议 JAVA的支持
+
+UDP server 和 client端都有一个 DatagramSocket(数据包套接字) ， 他不会等待请求。
+
+每个数据包都必须包含从哪儿发、 到哪儿去、数据等信息
+
+DatagramSocket 用于收发数据包
+
+DatagramPacket 用于传递具体的信息
+
+详细： 
+
+DatagramSocket ： 指定服务器端地址 、 端口
+
+构造器有 port /  （addr , port） /  () - > connet(addr, port)
+
+receive(DatagramPacket dp);
+
+
+DatagramPacket 一种分为 接收的数据包 （byte[] length）  第一次接收完 数据包中会初始化出 addr port等信息
+
+							 一种分为发送的数据包 ： 发送数据包需要知道 (byte[] length addr port )
+							 
+设计范式：
+
+观察者模式 (observer)
+
+
+
+
+
+
+
+
+
+
+
+
+ 

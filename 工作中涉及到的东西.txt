@@ -1,0 +1,20 @@
+1. spring boot  
+
+2. spring cloud ---- 很多组件
+
+3. redis 
+
+4. hbase
+
+5. maven
+
+6. git
+
+7. docker
+
+8. scala
+
+9. kafka
+
+在本地机器上部署 研究各种现象
+

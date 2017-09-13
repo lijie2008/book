@@ -1,0 +1,69 @@
+-------------------------stringRedisTemplate 用法 ----------------------------
+
+stringRedisTemplate.opsForValue().set("test", "100",60*10,TimeUnit.SECONDS);//向redis里存入数据和设置缓存时间
+
+tringRedisTemplate.boundValueOps("test").increment(-1);//val做-1操作  
+
+stringRedisTemplate.opsForValue().get("test")//根据key获取缓存中的val  
+
+stringRedisTemplate.boundValueOps("test").increment(1);//val +1
+
+stringRedisTemplate.getExpire("test")//根据key获取过期时间 
+
+stringRedisTemplate.getExpire("test",TimeUnit.SECONDS)//根据key获取过期时间并换算成指定单位  
+
+stringRedisTemplate.delete("test");//根据key删除缓存 
+
+stringRedisTemplate.hasKey("546545");//检查key是否存在，返回boolean值  
+
+stringRedisTemplate.opsForSet().add("red_123", "1","2","3");//向指定key中存放set集合 
+
+stringRedisTemplate.expire("red_123",1000 , TimeUnit.MILLISECONDS);//设置过期时间  
+
+stringRedisTemplate.opsForSet().isMember("red_123", "1")//根据key查看集合中是否存在指定数据
+
+stringRedisTemplate.opsForSet().members("red_123");//根据key获取set集合  
+
+---------------------------------------Redis 介绍 -------------------------
+
+Redis 可以存储键与5种不同数据结构类型之间的映射，
+
+这5种数据结构类型分别为String（字符串）、List（列表）、Set（集合）、Hash（散列）和 Zset（有序集合）
+
+String 可以是字符串、整数或者浮点数  																								对整个字符串或者字符串的其中一部分执行操作；对象和浮点数执行自增(increment)或者自减(decrement)
+
+Set    包含字符串的无序收集器(unorderedcollection)，                                 添加、获取、移除单个元素；检查一个元素是否存在于某个集合中；计算交集、并集、差集；从集合里卖弄随机获取元素
+
+			并且被包含的每个字符串都是独一无二的、各不相同
+
+list  一个链表，链表上的每个节点都包含了一个字符串                                   从链表的两端推入或者弹出元素；根据偏移量对链表进行修剪(trim)；读取单个或者多个元素；根据值来查找或者移除元素
+
+
+spring 封装了 RedisTemplate 对象来进行对redis的各种操作，它支持所有的 redis 原生的 api。
+
+
+org.springframework.data.redis.core
+Class RedisTemplate<K,V>
+java.lang.Object
+    org.springframework.data.redis.core.RedisAccessor
+        org.springframework.data.redis.core.RedisTemplate<K,V>
+
+the Redis key type against which the template works (usually a String)
+模板中的Redis key的类型（通常为String）如：RedisTemplate<String, Object>
+注意：如果没特殊情况，切勿定义成RedisTemplate<Object, Object>，否则根据里氏替换原则，使用的时候会造成类型错误
+
+五种数据结构：
+
+redisTemplate.opsForValue();//操作字符串
+redisTemplate.opsForHash();//操作hash
+redisTemplate.opsForList();//操作list
+redisTemplate.opsForSet();//操作set
+redisTemplate.opsForZSet();//操作有序set
+
+StringRedisTemplate ---- RedisTemplate 序列化方式不一样
+
+Redis的String数据结构 （推荐使用StringRedisTemplate）  注意：如果使用RedisTemplate需要更改序列化方式
+
+
+
+

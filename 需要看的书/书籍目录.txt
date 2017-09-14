@@ -5,3 +5,7 @@ java 核心技术
 Effective Java
 
 Object-Oriented Design with Application
+
+Apache 软件: install 
+
+http://www.apache.org/dyn/closer.cgi#verify 

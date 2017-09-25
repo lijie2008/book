@@ -1,0 +1,132 @@
+1. git 分布式版本控制系统
+
+git init 初始化git库
+
+git status 查看库状态 
+
+git add filename
+
+git commit -m "" 提交git库文件
+
+git diff filename 查看文件 和上一个版本有什么不同
+
+git diff HEAD -- filename 当前版本库里面的版本和当前文件的区别
+
+git log 可以看到版本控制中的日志信息
+
+HEAD 在git中代表当前版本 上一个版本叫 HEAD^ 上上一个版本叫 HEAD^^ 太多的话共 HEAD~n
+
+git reset --hard HEAD^ 回退到上一个版本
+
+git reset --hard commit_id 回退版本，将暂存区的东西撤销，重新放回工作区
+
+git reflog 查看历史命令 以便确定回到哪个版本
+
+git checkout -- filename 丢弃工作区的修改。
+
+工作区 和 暂存区的概念
+
+工作区是当前文件目录
+
+版本库：Repository 
+
+工作区有个隐藏的.git 是版本库
+
+暂存区 stage 
+
+版本库怎么控制版本的？ 基本逻辑是中间存在一个 暂存区 stage git为我们自动创建第一个分支master 
+
+以及只想master的第一个指针HEAD 每次提交的数据都是放入到暂存区之中。
+
+远程仓库：
+
+	git仓库托管
+	
+	1. 创建 SSH Key 
+	
+	2.先有本地库后有远程库：
+	
+	关联远程库 git remote add origin git@server-name:path/repo-name.git
+	
+	关联后，使用命令git push -u origin master 第一次推送master 分支的所有内容
+	
+	此后，每次本地提交后，只要有必要，就可以使用命令 git push origin master 推送最新版本
+	
+	3.先有远程库 然后从远程库克隆
+	
+	git clone 远程工程路径 git 支持多协议 可以使用http://github.com/servername ...
+	
+	git clone git@github.com:servername/***.git
+	
+	分支管理：svn类似 
+	
+	master指针 和 HEAD指针的协同工作： 创建一个分支就是提供一个指针dev 指向当前，
+	
+	然后移动dev指针，head指针指向dev，如果合并分支，只需要将master指针指向当前的dev即可。
+	
+	创建dev指针： git branch dev  
+	切换到dev指针：git checkout dev          ---- 合并 ： git checkout -b dev
+	
+	查看分支：git branch  当前分支会在前面加 *
+	
+	时刻注意自己所在的分支结构。
+	
+	git merge branch_name 用于合并指定分支到当前分支
+	
+	git branch -d branch_name 删除某个分支
+	
+	因为创建、合并、删除分支效果非常快，所以Git鼓励使用分支完成某个任务， git log --graph 查看分支合并图
+	
+	这和直接在master上工作效果一致，但过程安全
+	
+	如果丢弃分支，但是分支未合并时，使用 git branch -D branch_name
+	
+	使用https时，每次都需要验证用户名密码。 可用 git remote -v 查看自己的版本库的来源
+	
+	
+	
+	及时存取工作现场： git stash  
+	
+	查看工作现场： git stash list
+	
+	可使用多种方法恢复数据：git stash apply  + git stash drop 
+	
+	或者 git stash pop
+	
+	多人协同工作的流程
+	
+	1. 可以用git pull 来检查当前版本是否最新
+	
+	2. git push origin branch_name 推送自己的修改
+	
+	3. 推送失败的话，须将远程分支合并到本地 git pull
+	
+	4. 如果合并有冲突，解决冲突，重新提交
+	
+	5. 没有冲突或者解决了冲突后，再用git push origin branch_name 推送成功
+	
+	git pull 有可能提示 no tracking information 则说明本地分支和远程分支链接关系没有建立
+	git branch --set-upstream branch_name origin/branch_name
+	
+	常用的命令 
+	查看远程库 git remote -v
+	
+	本地新建的分支如果不推送，对其他人就是不可见的
+	
+	从本地推送分支 使用 git push origin branch_name 如果推送失败，先用git pull 抓取远程的新提交
+	
+	建立本地分支和远程分支的关联 git checkout -b branch_name origin/branch_name 本地最好和远程名称一致
+	
+	标签：
+	git tag
+	git tag -a tag_name -m tag_state commit_id
+	
+	git show tagname
+	
+	标签的操作：
+	git tag -d tagname 删除标签
+	
+	向远程推送标签 git push orgin tagname
+	
+	
+	

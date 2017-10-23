@@ -1,0 +1,39 @@
+1. 常用网站： https://springcloud.cc/                 http://www.cnblogs.com/ilinuxer/p/6580998.html
+
+2. 组件集合
+	
+	a. config server : https://springcloud.cc/spring-cloud-config.html 详细解释
+	
+	启动 config server 服务器 指向git的存储的配置文件
+	
+	server:
+  port: 3003
+spring:
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/lijie2008/config-server.git  
+          
+          
+	client 端使用 uri 去 找到文件 applicationName - profile
+	
+	server:
+  port: 3004
+spring:
+  application:
+    name: test-data
+  cloud:
+    config:
+      profile: dev
+      uri: http://localhost:3003
+      
+      
+      
+  b. Hystrix 熔断机制
+  
+  c. Feign  HTTP框架  http://www.cnblogs.com/xiaohouzai/p/7282811.html webservice
+   
+  
+	
+	

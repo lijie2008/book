@@ -9,3 +9,15 @@ Object-Oriented Design with Application
 Apache 软件: install 
 
 http://www.apache.org/dyn/closer.cgi#verify 
+
+JWT
+
+DUBBO架构 - 服务管控平台
+
+
+https://www.nginx.com/blog/service-discovery-in-a-microservices-architecture/
+
+
+Spring boot 和 webSocket的结合
+
+http://blog.csdn.net/u012373815/article/details/54380476
